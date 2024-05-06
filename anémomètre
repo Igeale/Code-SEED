@@ -1,0 +1,59 @@
+#define PIN_ANEMOMETER_2  2
+
+float t0 = 0;
+
+int Compteur;
+float Diametre;
+boolean Interrupteur;
+float Ancien_Temps;
+float Tours_par_minute;
+float Vitesse_du_vent;
+
+void serial_setupConnection(int baudrate) {
+  Serial.begin(baudrate);
+  while (!Serial) {
+    Serial.println("En attente de l'ouverture du port série...");
+    delay(1000);
+  }
+  Serial.println("Port série activé. Baudrate: " + String(baudrate));
+  delay(50);
+}
+
+
+void setup() {
+  pinMode(PIN_ANEMOMETER_2, INPUT);
+  serial_setupConnection(9600);
+  Compteur = 0;
+  Diametre = 0.13;
+  Interrupteur = false;
+  Ancien_Temps = 0.1;
+  Tours_par_minute = 0.1;
+  Vitesse_du_vent = 0.1;
+}
+
+void loop() {
+  if (digitalRead(PIN_ANEMOMETER_2) == HIGH && Interrupteur == false) {
+    Compteur += 1;
+    Interrupteur = true;
+  } else if (digitalRead(PIN_ANEMOMETER_2) == LOW) {
+    Interrupteur = false;
+  }
+  if ((millis()-t0)/1000.0 - Ancien_Temps >= 10) {
+    Tours_par_minute = 3 * Compteur;
+    Vitesse_du_vent = Tours_par_minute * (Diametre * (3.14 / 60));
+    Ancien_Temps = (millis()-t0)/1000.0;
+    Compteur = 0;
+  }
+  Serial.print("@Graph:");
+  Serial.print(""":");
+  Serial.print("");
+  Serial.print("|");
+  Serial.print(Compteur);
+  Serial.print("|");
+  Serial.print(Tours_par_minute);
+  Serial.print("|");
+  Serial.print(Vitesse_du_vent);
+  Serial.print("|");
+  Serial.print("\n");
+  delay(50);
+}
