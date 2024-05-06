@@ -1,0 +1,53 @@
+#include <SPI.h>
+#include <Ethernet.h>
+#include <Wire.h>
+#include <Adafruit_BMP085.h>
+#include <DHT.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT11
+
+Adafruit_BMP085 bmp;
+DHT dht(DHTPIN, DHTTYPE);
+
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; // Adresse MAC de votre shield Ethernet
+IPAddress ip(192, 168, 1, 177); // Adresse IP de votre Arduino
+EthernetServer server(80); // Port sur lequel le serveur écoute
+
+void setup() {
+  Ethernet.begin(mac, ip);
+  server.begin();
+  dht.begin();
+  bmp.begin();
+}
+
+void loop() {
+  EthernetClient client = server.available();
+
+  if (client) {
+    while (client.connected()) {
+      if (client.available()) {
+        client.println("HTTP/1.1 200 OK");
+        client.println("Content-Type: text/html");
+        client.println();
+
+        float temperature = dht.readTemperature();
+        float humidity = dht.readHumidity();
+        float pressure = bmp.readPressure();
+
+        client.print("Temperature: ");
+        client.print(temperature);
+        client.println(" °C<br>");
+        client.print("Humidity: ");
+        client.print(humidity);
+        client.println(" %<br>");
+        client.print("Pressure: ");
+        client.print(pressure);
+        client.println(" Pa<br>");
+
+        break;
+      }
+    }
+    client.stop();
+  }
+}
