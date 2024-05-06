@@ -1,0 +1,18 @@
+import Adafruit_BMP.BMP085 as BMP085
+
+# Initialize the BMP085 sensor
+sensor = BMP085.BMP085()
+
+# Read the temperature from the sensor
+temperature = sensor.read_temperature()
+
+# Read the pressure from the sensor (in pascals)
+pressure = sensor.read_pressure()
+
+# Calculate the altitude based on the sea-level pressure (in pascals)
+sea_level_pressure = 101325  # Average sea-level pressure in pascals
+altitude = sensor.read_altitude(sea_level_pressure)
+
+print('Temperature = {0:0.2f} °C'.format(temperature))
+print('Pressure = {0:0.2f} Pa'.format(pressure))
+print('Altitude = {0:0.2f} meters'.format(altitude))
