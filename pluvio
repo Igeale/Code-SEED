@@ -1,0 +1,30 @@
+// Définition du pin de signal du pluviomètre
+const int pluviometrePin = 2; // Exemple, peut être modifié selon votre configuration
+
+// Variable pour stocker le nombre de précipitations
+int precipitations = 0;
+
+void setup() {
+  // Initialise le pin du pluviomètre en mode d'entrée
+  pinMode(pluviometrePin, INPUT);
+  
+  // Démarre la communication série
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Vérifie si le pluviomètre a détecté une précipitation
+  if (digitalRead(pluviometrePin) == HIGH) {
+    // Incrémente le nombre de précipitations
+    precipitations++;
+    
+    // Attend un court délai pour éviter de compter plusieurs fois le même godet
+    delay(50);
+  }
+  
+  // Affiche le nombre de précipitations toutes les 5 secondes
+  if (millis() % 5000 == 0) {
+    Serial.print("Nombre de précipitations : ");
+    Serial.println(precipitations);
+  }
+}
