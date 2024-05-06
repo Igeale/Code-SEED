@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Arduino Sensor Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .sensor {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .sensor h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Arduino Sensor Data</h1>
+    
+    <div class="sensor" id="temperature">
+      <h2>Temperature</h2>
+      <p>Loading...</p>
+    </div>
+    
+    <div class="sensor" id="humidity">
+      <h2>Humidity</h2>
+      <p>Loading...</p>
+    </div>
+    
+    <div class="sensor" id="pressure">
+      <h2>Pressure</h2>
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  <script>
+    function fetchData() {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status == 200) {
+            var data = JSON.parse(xhr.responseText);
+            document.getElementById("temperature").innerHTML = "<h2>Temperature</h2><p>" + data.temperature + " °C</p>";
+            document.getElementById("humidity").innerHTML = "<h2>Humidity</h2><p>" + data.humidity + " %</p>";
+            document.getElementById("pressure").innerHTML = "<h2>Pressure</h2><p>" + data.pressure + " Pa</p>";
+          } else {
+            console.log("Error fetching data: " + xhr.status);
+          }
+        }
+      };
+      xhr.open("GET", "http://192.168.1.177/", true);
+      xhr.send();
+    }
+
+    fetchData();
+    setInterval(fetchData, 5000); // Fetch data every 5 seconds
+  </script>
+</body>
+</html>
