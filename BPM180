@@ -1,18 +1,40 @@
-import Adafruit_BMP.BMP085 as BMP085
+#include <Wire.h>
+#include <Adafruit_BMP085.h>
 
-# Initialize the BMP085 sensor
-sensor = BMP085.BMP085()
+Adafruit_BMP085 bmp;
 
-# Read the temperature from the sensor
-temperature = sensor.read_temperature()
+void setup() {
+  Serial.begin(9600);
+  if (!bmp.begin()) {
+    Serial.println("Could not find BMP180 sensor, check wiring!");
+    while (1);
+  }
+}
 
-# Read the pressure from the sensor (in pascals)
-pressure = sensor.read_pressure()
+void loop() {
+  // Read temperature from the sensor
+  float temperature = bmp.readTemperature();
 
-# Calculate the altitude based on the sea-level pressure (in pascals)
-sea_level_pressure = 101325  # Average sea-level pressure in pascals
-altitude = sensor.read_altitude(sea_level_pressure)
+  // Read pressure from the sensor (in pascals)
+  float pressure = bmp.readPressure();
 
-print('Temperature = {0:0.2f} °C'.format(temperature))
-print('Pressure = {0:0.2f} Pa'.format(pressure))
-print('Altitude = {0:0.2f} meters'.format(altitude))
+  // Calculate altitude based on the sea-level pressure (in pascals)
+  // Adjust the sea level pressure based on your location
+  float seaLevelPressure = 101325; // Average sea-level pressure in pascals
+  float altitude = bmp.readAltitude(seaLevelPressure);
+
+  // Print the sensor data
+  Serial.print("Temperature = ");
+  Serial.print(temperature);
+  Serial.println(" °C");
+
+  Serial.print("Pressure = ");
+  Serial.print(pressure);
+  Serial.println(" Pa");
+
+  Serial.print("Altitude = ");
+  Serial.print(altitude);
+  Serial.println(" meters");
+
+  delay(2000); // Wait for 2 seconds before taking another reading
+}
